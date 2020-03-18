@@ -1,0 +1,14 @@
+{
+  "name": "essos",
+  "version": "1.0.0",
+  "description": "Real-time chat application built on top of electronjs.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "author": "nospyrin",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^8.0.3"
+  }
+}
