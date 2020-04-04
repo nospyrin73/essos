@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>Essos</title>
+
+        <link rel="stylesheet" href="../public/app.css">
+    </head>
+    <body class="page">
+        <!-- <div class="sidebar">
+            <ul>
+                <li></li>
+                <li></li>
+            </ul>
+        </div> -->
+
+        <div class="contacts">
+            <div class="profile">
+                <div class="profile__avatar"><span class="avatar"></span></div>
+                <div class="profile__username"><span class="username"></span></div>
+            </div>
+
+            <ul class="contacts__list">
+                <li class="contact">
+                    <span class="avatar"></span>
+                    <span class="username">username</span>
+                </li>
+            </ul>
+
+            <input class="search-bar" type="text" placeholder="Search for someone..." onkeydown="findUser(this)">
+        </div>
+
+        <div class="chat">
+            <div class="chat__chat-area">
+                <ul class="chat__messages-list">
+                    <li class="message">
+                        <div class="user-nickname">nospyrin</div>
+                        <div class="content">
+                            When you play the game of thrones, you win or you die. There is no middle ground.
+                        </div>
+                    </li>
+                    <li class="message">
+                        <div class="user-nickname">nospyrin</div>
+                        <div class="content">
+                            It's hard to put a leash on a dog once you've put a crown on its head.
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="chat__chat-input">
+                <form action="">
+                    <input type="text" name="message" placeholder="Say something...">
+                </form>
+            </div>
+        </div>
+
+        <script>
+            const { remote } = require('electron');
+
+            function findUser(input) {
+
+            }
+
+            console.log(remote.getGlobal('sharedObject'));
+
+            document.querySelector(".profile__username .username").textContent = remote.getGlobal('sharedObject').thisUser.username;
+            let contactsList = document.querySelectorAll(".contacts__list");
+            contactsList[0].innerHTML = `
+                <li class="contact">
+                    <span class="avatar"></span>
+                    <span class="username">${myName = "tarzan"}</span>
+                </li>
+                `
+        </script>
+    </body>
+</html>
