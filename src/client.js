@@ -1,18 +1,17 @@
-import net from 'net';
-const { host, port } = require('./../essos-config.json');
 import { EssosSocket } from './essos-protocol';
 import { handle } from './handler';
+import net from 'net';
+
+const { host, port } = require('../remote.json');
 
 export function init(cb) {
-    global.essClient = {
-        host,
-        port
-    }
+    process.env.HOST = host;
+    process.env.PORT = port;
 
     // let socket;
     // try {
         let socket = new net.Socket();
-        socket.connect(global.essClient.port, global.essClient.host);
+        socket.connect(process.env.HOST, process.env.HOST);
     // } catch (err) {
     //     console.log('Could not connect to the server!');
     //     console.log(err);
