@@ -1,9 +1,9 @@
-const net = require('net');
+import net from 'net';
 const { host, port } = require('./../essos-config.json');
-const { EssosSocket } = require('./essos-protocol');
-const { handle } = require('./handler');
+import { EssosSocket } from './essos-protocol';
+import { handle } from './handler';
 
-function init(cb) {
+export function init(cb) {
     global.essClient = {
         host,
         port
@@ -11,7 +11,7 @@ function init(cb) {
 
     // let socket;
     // try {
-        socket = new net.Socket();
+        let socket = new net.Socket();
         socket.connect(global.essClient.port, global.essClient.host);
     // } catch (err) {
     //     console.log('Could not connect to the server!');
@@ -29,7 +29,7 @@ function init(cb) {
     console.log('Made it!');
 
     socket.on('data', (chunk) => {
-        responses = essSocket.read(chunk);
+        let responses = essSocket.read(chunk);
 
         responses.forEach((response) => {
             handle(response);
@@ -42,5 +42,3 @@ function init(cb) {
     cb();
     // to-do: return Promise
 }
-
-module.exports = { init };

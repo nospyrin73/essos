@@ -1,8 +1,8 @@
-const React = require('react');
-const { requestEmitter } = require('./../request');
-const { updateState } = require('./../render');
+import React from 'react';
+import { reqEmitter } from '../request';
+import { updateState } from '../render';
 
-class Dash extends React.Component {
+export default class Dash extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -165,7 +165,7 @@ class JoinChatView extends React.Component {
     }
 
     handleSubmit(event) {
-        requestEmitter.emit('join-channel', this.state.self.username, this.state.searchValue);
+        reqEmitter.emit('join-channel', this.state.self.username, this.state.searchValue);
         event.preventDefault();
     }
 
@@ -204,7 +204,7 @@ class ChatView extends React.Component {
 
     handleSubmit(event) {
         if (event.key === 'Enter') {
-            requestEmitter.emit('send-message', {
+            reqEmitter.emit('send-message', {
                 sender: this.state.self.username,
                 receiver: this.state.view.info.channel.id,
                 message: this.state.messageText,
@@ -223,7 +223,7 @@ class ChatView extends React.Component {
                     onChange={(event) => this.setState({toAdd: event.target.value})}
                     onKeyDown={(event) => {
                         if (event.key === 'Enter') {
-                            requestEmitter.emit('join-channel', this.state.self.username, this.state.toAdd, this.state.view.info.channel.id);
+                            reqEmitter.emit('join-channel', this.state.self.username, this.state.toAdd, this.state.view.info.channel.id);
                             
                             event.target.value = '';
                         }
@@ -270,4 +270,3 @@ class ChatView extends React.Component {
         view: "home" || "join-chat" || "chat",
     }
  */
-module.exports = Dash;

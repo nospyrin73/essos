@@ -1,6 +1,6 @@
-const React = require('react');
-const ReactDOM = require('react-dom');
-// const {App} = require('./components/App');
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './components/App';
 
 let state = {
     self: {
@@ -15,7 +15,7 @@ let state = {
     },
 }
 
-function updateState(username, password, channels, isLoggedIn = false, view = {name: 'home', info: {}}) {
+export function updateState(username, password, channels, isLoggedIn = false, view = {name: 'home', info: {}}) {
     state.self = {
         username: username || state.self.username,
         password: password || state.self.password
@@ -28,8 +28,4 @@ function updateState(username, password, channels, isLoggedIn = false, view = {n
         <App state={state}/>,
         document.getElementById('root')
     );
-}
-
-module.exports = {
-    updateState
 }

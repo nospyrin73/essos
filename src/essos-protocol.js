@@ -1,4 +1,4 @@
-class EssosSocket {
+export class EssosSocket {
     constructor(socket) {
         this._socket = socket;
 
@@ -100,23 +100,17 @@ class EssosSocket {
     }
 }
 
-class Request {
+export class Request {
     constructor(action, body) {
         this.action = action;
         this.body = body;
     }
 }
 
-class Response {
+export class Response {
     constructor(action, status, body) {
         this.action = action;
         this.status = status;
         this.body = body;
     }
 }
-
-module.exports = {
-    EssosSocket,
-    Request,
-    Response
-};

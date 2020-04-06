@@ -1,8 +1,8 @@
-const React = require('react');
-const Auth = require('./Auth');
-const Dash = require('./Dash');
+import React from 'react';
+import Auth from './Auth';
+import Dash from './Dash';
 
-class App extends React.Component {
+export default class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -19,13 +19,3 @@ class App extends React.Component {
         return (state.isLoggedIn) ? <Dash state={state}/> : <Auth state={state}/>
     }
 }
-
-function foo() {
-    console.log('hello from App!');
-}
-
-global.App = App;
-
-module.exports = {
-    App, foo
-};

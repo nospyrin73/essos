@@ -1,6 +1,4 @@
-const React = require('react');
-const ReactDOM = require('react-dom');
-const { updateState } = require('./render');
+import { updateState } from './render';
 
 let handlers = {
     '/login': login,
@@ -9,7 +7,7 @@ let handlers = {
     '/update-chat': updateChat,
 }
 
-function handle(response) {
+export function handle(response) {
     // to-do: handle err responses
     handlers[response.action](response.body);
 }
@@ -38,8 +36,4 @@ function openChannel(content) {
 function updateChat(content) {
     let { channel, channels } = content;
     updateState(null, null, channels, true, {name: 'chat', info: {channel}});
-}
-
-module.exports = {
-    handle,
 }

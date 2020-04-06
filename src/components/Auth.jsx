@@ -1,7 +1,7 @@
-const React = require('react');
-const { requestEmitter } = require('./../request');
+import React from 'react';
+import { reqEmitter } from '../request';
 
-class Auth extends React.Component {
+export default class Auth extends React.Component {
     render() {
         return (
             <div className='auth-container'>
@@ -33,7 +33,7 @@ class Form extends React.Component {
     }
 
     handleSubmit(event) {
-        requestEmitter.emit('login', this.state.username);
+        reqEmitter.emit('login', this.state.username);
         event.preventDefault();
     }
 
@@ -72,5 +72,3 @@ class Form extends React.Component {
         );
     }
 }
-
-module.exports = Auth;

@@ -1,12 +1,13 @@
-const requestEmitter = new (require('events').EventEmitter);
-const { Request } = require('./essos-protocol');
-const { updateState } = require('./render');
+import { EventEmitter } from 'events';
+import { Request } from './essos-protocol';
 
-requestEmitter.on('login', login);
-requestEmitter.on('find-user', findUser);
-requestEmitter.on('join-channel', joinChannel);
-requestEmitter.on('open-chat', openChat);
-requestEmitter.on('send-message', sendChatMessage);
+export const reqEmitter = new EventEmitter();
+
+reqEmitter.on('login', login);
+reqEmitter.on('find-user', findUser);
+reqEmitter.on('join-channel', joinChannel);
+reqEmitter.on('open-chat', openChat);
+reqEmitter.on('send-message', sendChatMessage);
 
 
 function login(username, password) {
@@ -58,7 +59,3 @@ function sendChatMessage(content) {
 
     global.essClient.socket.write(request);
 }
-
-module.exports = {
-    requestEmitter
-};

@@ -2,14 +2,14 @@
   "name": "essos",
   "version": "1.0.0",
   "description": "Real-time chat application built on top of electronjs.",
+  "author": "nospyrin",
+  "license": "MIT",
   "main": "electron.js",
   "scripts": {
     "electron": "electron .",
     "build": "babel src -d lib",
     "start": "npm run build && npm run electron"
   },
-  "author": "nospyrin",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git://github.com/nospyrin73/essos.git"
@@ -21,11 +21,13 @@
   "devDependencies": {
     "@babel/cli": "^7.8.4",
     "@babel/core": "^7.8.7",
+    "@babel/preset-env": "^7.9.0",
     "@babel/preset-react": "^7.8.3",
     "electron": "^8.0.3"
   },
   "babel": {
     "presets": [
+      "@babel/preset-env",
       "@babel/react"
     ]
   }
