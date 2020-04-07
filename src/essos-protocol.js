@@ -1,6 +1,9 @@
 export class EssosSocket {
-    constructor(socket) {
+    constructor(socket, handle) {
         this._socket = socket;
+        this._socket.on('data', this._onData.bind(this));
+
+        this._handle = handle;
 
         this._buffer = ''; // to persistently store unread buffered data
         this.delimiter = '#';
@@ -9,7 +12,7 @@ export class EssosSocket {
             offset: 0, // how far into the content's been read so far
             chunk: ''
         };
-            
+
         this.parsedObjs = [];
     }
 
@@ -44,7 +47,7 @@ export class EssosSocket {
                     // take a step back for whenever that data is
                     // made available to us
                     this._parsing.offset--;
-                    
+
                     return; // *
                 }
 
@@ -94,7 +97,17 @@ export class EssosSocket {
         }
     }
 
-    clear() {
+    _onData(chunk) {
+        let parsedObjs = this.read(chunk);
+
+        parsedObjs.forEach((obj) => {
+            this._handle(obj);
+        })
+
+        this._clear();
+    }
+
+    _clear() {
         // should be called after all parsed objects have been handled
         this.parsedObjs = [];
     }

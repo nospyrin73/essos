@@ -11,7 +11,7 @@ export function init(cb) {
     // let socket;
     // try {
         let socket = new net.Socket();
-        socket.connect(process.env.HOST, process.env.HOST);
+        socket.connect(process.env.PORT, process.env.HOST);
     // } catch (err) {
     //     console.log('Could not connect to the server!');
     //     console.log(err);
@@ -20,23 +20,11 @@ export function init(cb) {
     // }
 
     socket.on('connect', () => {
-        console.log(`Connected to ${global.essClient.host}:${global.essClient.port}`);
+        console.log(`Connected to ${process.env.HOST}:${process.env.PORT}`);
     });
 
     let essSocket = new EssosSocket(socket);
-    global.essClient.socket = essSocket;
     console.log('Made it!');
-
-    socket.on('data', (chunk) => {
-        let responses = essSocket.read(chunk);
-
-        responses.forEach((response) => {
-            handle(response);
-        });
-
-        essSocket.clear();
-    });
-
 
     cb();
     // to-do: return Promise
