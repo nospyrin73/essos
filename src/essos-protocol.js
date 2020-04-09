@@ -1,7 +1,7 @@
 export class EssosSocket {
     constructor(socket, handle) {
         this._socket = socket;
-        this._socket.on('data', this._onData.bind(this));
+        // this._socket.on('data', this._onData.bind(this));
 
         this._handle = handle;
 
@@ -71,11 +71,12 @@ export class EssosSocket {
                 length: null,
                 offset: 0,
                 chunk: ''
-            }
+            };
         }
 
         return this.parsedObjs;
     }
+
     write(data) {
         // loosely check for null/undefined
         if (data == null) return false;
@@ -97,17 +98,7 @@ export class EssosSocket {
         }
     }
 
-    _onData(chunk) {
-        let parsedObjs = this.read(chunk);
-
-        parsedObjs.forEach((obj) => {
-            this._handle(obj);
-        })
-
-        this._clear();
-    }
-
-    _clear() {
+    clear() {
         // should be called after all parsed objects have been handled
         this.parsedObjs = [];
     }

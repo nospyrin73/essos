@@ -7,7 +7,7 @@ export default class Dash extends React.Component {
         super(props);
         this.state = {
             ...this.props.state
-        }
+        };
 
         this.showView = this.showView.bind(this);
     }
@@ -16,7 +16,7 @@ export default class Dash extends React.Component {
         this.setState((state) => {
             state.view = {
                 name, info
-            }
+            };
 
             updateState(this.state.self.username, this.state.self.password, null, true, this.state.view);
         });
@@ -41,7 +41,7 @@ class Sidebar extends React.Component {
         super(props);
         this.state = {
             ...this.props.state
-        }
+        };
     }
 
     componentWillReceiveProps(nextProps) {
@@ -59,26 +59,26 @@ class Sidebar extends React.Component {
                 <div className='channels'>
                     {(this.state.channels.length === 0) ? (
                         <div className='channels__no-channels'>
-                            <button className='add-someone' onClick={(e) => { this.props.showView(e, 'join-channel') }}>
+                            <button className='add-someone' onClick={(e) => { this.props.showView(e, 'join-channel'); }}>
                                 Add Someone
                             </button>
                         </div>
                     ) : (
-                            <ul className='channels__list'>
-                                {
-                                    this.state.channels.map(channel => {
-                                        return (
-                                            <Channel
-                                                state={this.state}
-                                                key={channel.id}
-                                                id={channel.id}
-                                                onClick={(e) => { this.props.showView(e, 'chat', { channel }); }}
-                                            />
-                                        );
-                                    })
-                                }
-                            </ul>
-                        )}
+                        <ul className='channels__list'>
+                            {
+                                this.state.channels.map(channel => {
+                                    return (
+                                        <Channel
+                                            state={this.state}
+                                            key={channel.id}
+                                            id={channel.id}
+                                            onClick={(e) => { this.props.showView(e, 'chat', { channel }); }}
+                                        />
+                                    );
+                                })
+                            }
+                        </ul>
+                    )}
                 </div>
             </div>
         );
@@ -91,7 +91,7 @@ class Channel extends React.Component {
         super(props);
         this.state = {
             ...this.props.state
-        }
+        };
     }
 
     componentWillReceiveProps(nextProps) {
@@ -112,9 +112,7 @@ class MainView extends React.Component {
         super(props);
         this.state = {
             ...this.props.state,
-        }
-        console.log(`from mv constructor`);
-        console.dir(this.state.view);
+        };
     }
 
     componentWillReceiveProps(nextProps) {
@@ -125,15 +123,15 @@ class MainView extends React.Component {
         // console.dir(this.props.view);
         let view;
         switch (this.state.view.name) {
-            case 'join-channel':
-                view = <JoinChatView state={this.state} />;
-                break;
-            case 'chat':
-                view = <ChatView state={this.state} />
-                break;
-            case 'home':
-            default:
-                view = <div className='home-view'>Home</div>;
+        case 'join-channel':
+            view = <JoinChatView state={this.state} />;
+            break;
+        case 'chat':
+            view = <ChatView state={this.state} />;
+            break;
+        case 'home':
+        default:
+            view = <div className='home-view'>Home</div>;
         }
 
         return (
@@ -220,11 +218,11 @@ class ChatView extends React.Component {
             <div className='chat'>
                 <input type='text' className='chat__input'
                     placeholder='Add someone...'
-                    onChange={(event) => this.setState({toAdd: event.target.value})}
+                    onChange={(event) => this.setState({ toAdd: event.target.value })}
                     onKeyDown={(event) => {
                         if (event.key === 'Enter') {
                             reqEmitter.emit('join-channel', this.state.self.username, this.state.toAdd, this.state.view.info.channel.id);
-                            
+
                             event.target.value = '';
                         }
 
@@ -247,7 +245,7 @@ class ChatView extends React.Component {
 }
 
 
-/* 
+/*
 
  */
 

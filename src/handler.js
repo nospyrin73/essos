@@ -5,7 +5,7 @@ let handlers = {
     '/find-user': findUser,
     '/join-channel': joinChannel,
     '/update-chat': updateChat,
-}
+};
 
 export function handle(response) {
     // to-do: handle err responses
