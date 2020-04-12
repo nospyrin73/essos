@@ -1,4 +1,6 @@
 /* eslint-disable react/prop-types */
+import fs from 'fs';
+import path from 'path';
 import React from 'react';
 import { request, requestKeepAlive } from '../client';
 import { UserContext } from './UserContext';
@@ -156,14 +158,14 @@ class MainView extends React.Component {
         let active;
 
         switch (context.view.title) {
-        case 'home':
-            active = (<span>Home</span>);
-            break;
-        case 'user-search':
-            active = (<UserSearchView showView={this.props.showView} data={context.view.data} />);
-            break;
-        case 'chat':
-            active = (<ChatView channel={context.view.data.channel} />);
+            case 'home':
+                active = (<span>Home</span>);
+                break;
+            case 'user-search':
+                active = (<UserSearchView showView={this.props.showView} data={context.view.data} />);
+                break;
+            case 'chat':
+                active = (<ChatView channel={context.view.data.channel} />);
         }
 
         return (
@@ -237,6 +239,8 @@ class ChatView extends React.Component {
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleFileUpload = this.handleFileUpload.bind(this);
+
     }
 
     componentDidMount() {
@@ -280,26 +284,79 @@ class ChatView extends React.Component {
         }
     }
 
+    handleFileUpload(event) {
+        let absolutePath = event.target.files[0].path;
+        let fileName = path.basename(absolutePath);
+
+        let readStream = fs.createReadStream(absolutePath);
+        let data;
+        readStream.on('data', (chunk) => {
+            data += chunk;
+        });
+
+
+        request('upload-file', {
+            fileName,
+            content
+        }).then((res) => {
+            if (res.status === 'success') {
+                request('send-message', {
+                    token: this.context.token,
+                    outgoing: '',
+                    receiver: this.state.channel.id,
+                    attachments: [
+                        res.data.path
+                    ]
+                }).then((res) => {
+                    if (res.status === 'success') {
+                        this.setState({ channel: res.data.channel });
+                    } else if (res.status === 'fail') {
+                        console.log(res.err);
+                    }
+                });
+            } else if (res.status === 'fail') {
+                console.log(res.err);
+            }
+        });
+    }
+
+    downloadFile(event) {
+        let filePath; // get this
+
+        request('download-file', {
+            filePath
+        }).then((res) => {
+            let writable = fs.createWriteStream('../../db/' + res.data.fileName);
+            writable.write(res.data.content);
+        });
+    }
+
     render() {
         return (
             <div className='chat'>
                 <ul className='chat__history'>
                     {this.state.channel.messages.map(message => {
+                        let fileName;
+                        if(message.attachments) {
+                            fileName = message.attachments.fileName;
+                        }
                         return (
                             <li className='message' key={message.id}>
                                 <span className='message__sender'>{message.sender}</span>
                                 <span className='message__text'>{message.content}</span>
+                                <span className=''>{fileName}</span>
                             </li>
                         );
                     })}
                 </ul>
-                <input 
-                    type='text' 
-                    placeholder='Say something...' 
-                    className='chat__input' 
-                    onChange={this.handleChange} 
-                    onKeyDown={this.handleSubmit} 
+                <input
+                    type='text'
+                    placeholder='Say something...'
+                    className='chat__input'
+                    onChange={this.handleChange}
+                    onKeyDown={this.handleSubmit}
                 />
+                <input type='file' onChange={this.handleFileUpload} />
             </div>
         );
     }
