@@ -4,9 +4,9 @@ import App from './components/App';
 
 const { init } = require('./client');
 
-init(() => {
+init().then(() => {
     ReactDOM.render(
-        <App state={{}}/>,
+        <App />,
         document.getElementById('root')
     );
 });

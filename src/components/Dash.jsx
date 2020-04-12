@@ -1,51 +1,68 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
-import { reqEmitter } from '../request';
-import { updateState } from '../render';
+import { request, requestKeepAlive } from '../client';
+import { UserContext } from './UserContext';
 
 export default class Dash extends React.Component {
+    static contextType = UserContext;
+
     constructor(props) {
         super(props);
         this.state = {
-            ...this.props.state
+            view: {
+                title: 'home',
+                data: {}
+            }
         };
-
         this.showView = this.showView.bind(this);
     }
 
-    showView(event, name, info) {
-        this.setState((state) => {
-            state.view = {
-                name, info
-            };
-
-            updateState(this.state.self.username, this.state.self.password, null, true, this.state.view);
+    showView(event, title, data) {
+        this.setState({
+            view: {
+                title,
+                data
+            }
         });
-    }
-
-    componentWillReceiveProps(nextProps) {
-        this.setState(nextProps.state);
     }
 
     render() {
         return (
-            <div className='dash-container'>
-                <Sidebar showView={this.showView} state={this.state} />
-                <MainView state={this.state} />
-            </div>
+            <UserContext.Provider value={{
+                token: this.props.token,
+                view: this.state.view
+            }}>
+                <div className='dash-container'>
+                    <Sidebar showView={this.showView} />
+                    <MainView showView={this.showView} view={this.state.view} />
+                </div>
+            </UserContext.Provider>
         );
     }
 }
 
 class Sidebar extends React.Component {
-    constructor(props) {
-        super(props);
+    static contextType = UserContext;
+
+    constructor() {
+        super();
         this.state = {
-            ...this.props.state
+            username: ''
         };
     }
 
-    componentWillReceiveProps(nextProps) {
-        this.setState(nextProps.state);
+    componentDidMount() {
+        requestKeepAlive('load', {
+            resources: ['username'],
+            token: this.context.token,
+            keep_alive: true
+        }, (res) => {
+            if (res.status === 'success') {
+                this.setState({ username: res.data.username });
+            } else if (res.status === 'fail') {
+                console.log(res.err);
+            }
+        });
     }
 
     render() {
@@ -53,51 +70,75 @@ class Sidebar extends React.Component {
             <div className='sidebar'>
                 <div className='user-widget sidebar__user-widget'>
                     <span className='user-widget__avatar'></span>
-                    <span className='user-widget__username'>{this.state.self.username}</span>
+                    <span className='user-widget__username'>{this.state.username}</span>
                 </div>
 
-                <div className='channels'>
-                    {(this.state.channels.length === 0) ? (
-                        <div className='channels__no-channels'>
-                            <button className='add-someone' onClick={(e) => { this.props.showView(e, 'join-channel'); }}>
-                                Add Someone
-                            </button>
-                        </div>
-                    ) : (
-                        <ul className='channels__list'>
-                            {
-                                this.state.channels.map(channel => {
-                                    return (
-                                        <Channel
-                                            state={this.state}
-                                            key={channel.id}
-                                            id={channel.id}
-                                            onClick={(e) => { this.props.showView(e, 'chat', { channel }); }}
-                                        />
-                                    );
-                                })
-                            }
-                        </ul>
-                    )}
-                </div>
+                <ChannelList showView={this.props.showView} />
             </div>
         );
     }
 }
 
+class ChannelList extends React.Component {
+    static contextType = UserContext;
 
-class Channel extends React.Component {
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
         this.state = {
-            ...this.props.state
+            loading: true,
+            channels: []
         };
     }
 
-    componentWillReceiveProps(nextProps) {
-        this.setState(nextProps.state);
+    componentDidMount() {
+        requestKeepAlive('load', {
+            resources: ['channels'],
+            token: this.context.token,
+            keep_alive: true
+        }, (res) => {
+            if (res.status === 'success') {
+                this.setState({ loading: false, channels: res.data.channels }); // to-do: load channels individually - better ux
+            } else if (res.status === 'fail') {
+                // to-do: do something about the error
+                console.log(res.err);
+            }
+        });
     }
 
+    render() {
+        let channels = this.state.channels;
+
+        if (!channels.length) {
+            return (
+                <div className='channels__no-channels'>
+                    <button className='add-someone' onClick={(e) => { this.props.showView(e, 'user-search'); }}>
+                        Add Someone
+                    </button>
+                </div>
+            );
+        }
+
+
+        return (
+            <ul className='channels__list'>
+                {
+                    channels.map(channel => {
+                        return (
+                            <Channel
+                                state={this.state}
+                                key={channel.id}
+                                id={channel.id}
+                                onClick={(e) => { this.props.showView(e, 'chat', { channel }); }}
+                            />
+                        );
+                    })
+                }
+            </ul>
+        );
+    }
+}
+
+class Channel extends React.Component {
     render() {
         return (
             <li className='channels__channel' onClick={this.props.onClick}>
@@ -108,62 +149,63 @@ class Channel extends React.Component {
 }
 
 class MainView extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            ...this.props.state,
-        };
-    }
-
-    componentWillReceiveProps(nextProps) {
-        this.setState(nextProps.state);
-    }
+    static contextType = UserContext;
 
     render() {
-        // console.dir(this.props.view);
-        let view;
-        switch (this.state.view.name) {
-        case 'join-channel':
-            view = <JoinChatView state={this.state} />;
+        let context = this.context;
+        let active;
+
+        switch (context.view.title) {
+        case 'home':
+            active = (<span>Home</span>);
+            break;
+        case 'user-search':
+            active = (<UserSearchView showView={this.props.showView} data={context.view.data} />);
             break;
         case 'chat':
-            view = <ChatView state={this.state} />;
-            break;
-        case 'home':
-        default:
-            view = <div className='home-view'>Home</div>;
+            active = (<ChatView channel={context.view.data.channel} />);
         }
 
         return (
             <div className='main-view'>
-                {view}
+                {active}
             </div>
         );
     }
 }
 
-class JoinChatView extends React.Component {
+class UserSearchView extends React.Component {
+    static contextType = UserContext;
+
     constructor(props) {
         super(props);
         this.state = {
-            searchValue: '',
-            ...this.props.state
-        }
+            query: '',
+        };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    componentWillReceiveProps(nextProps) {
-        this.setState(nextProps.state);
-    }
+    // componentWillReceiveProps(nextProps) {
+    //     this.setState(nextProps.state);
+    // }
 
     handleChange(event) {
-        this.setState({ searchValue: event.target.value });
+        this.setState({ query: event.target.value });
     }
 
     handleSubmit(event) {
-        reqEmitter.emit('join-channel', this.state.self.username, this.state.searchValue);
+        request('open-direct-message', {
+            token: this.context.token,
+            other: this.state.query
+        }).then((res) => {
+            if (res.status === 'success') {
+                this.props.showView(event, 'chat', { channel: res.data.channel });
+            } else if (res.status === 'fail') {
+                console.log(res.err);
+            }
+        });
         event.preventDefault();
     }
 
@@ -172,7 +214,7 @@ class JoinChatView extends React.Component {
             <form className='join-chat-view' onSubmit={this.handleSubmit}>
                 <input
                     className='search-user'
-                    value={this.state.searchValue}
+                    value={this.state.query}
                     onChange={this.handleChange}
                     autoFocus
                 />
@@ -182,31 +224,56 @@ class JoinChatView extends React.Component {
 }
 
 class ChatView extends React.Component {
+    static contextType = UserContext;
+
     constructor(props) {
         super(props);
         this.state = {
-            ...this.props.state
-        }
+            channel: {
+                messages: []
+            },
+            outgoing: ''
+        };
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
-    componentWillReceiveProps(nextProps) {
-        this.setState(nextProps.state);
+    componentDidMount() {
+        requestKeepAlive('load-chat', {
+            channel_id: this.context.view.data.channel.id,
+            token: this.context.token,
+            keep_alive: true
+        }, (res) => {
+            if (res.status === 'success') {
+                this.setState({ channel: res.data.channel });
+            } else if (res.status === 'fail') {
+                console.log(res.err);
+            }
+        });
+    }
+
+    componentWillUnmount() {
+        console.log(`unmounted ${this.channel.id || 'initial update'}`);
     }
 
     handleChange(event) {
-        this.setState({ messageText: event.target.value });
+        this.setState({ outgoing: event.target.value });
     }
 
     handleSubmit(event) {
         if (event.key === 'Enter') {
-            reqEmitter.emit('send-message', {
-                sender: this.state.self.username,
-                receiver: this.state.view.info.channel.id,
-                message: this.state.messageText,
-                time: new Date()
+            // to-do: do some message parsing (e.g. check if empty)
+            request('send-message', {
+                token: this.context.token,
+                outgoing: this.state.outgoing,
+                receiver: this.state.channel.id
+            }).then((res) => {
+                if (res.status === 'success') {
+                    this.setState({ channel: res.data.channel });
+                } else if (res.status === 'fail') {
+                    console.log(res.err);
+                }
             });
 
             event.target.value = '';
@@ -216,55 +283,41 @@ class ChatView extends React.Component {
     render() {
         return (
             <div className='chat'>
-                <input type='text' className='chat__input'
-                    placeholder='Add someone...'
-                    onChange={(event) => this.setState({ toAdd: event.target.value })}
-                    onKeyDown={(event) => {
-                        if (event.key === 'Enter') {
-                            reqEmitter.emit('join-channel', this.state.self.username, this.state.toAdd, this.state.view.info.channel.id);
-
-                            event.target.value = '';
-                        }
-
-                    }}
-                />
                 <ul className='chat__history'>
-                    {this.state.view.info.channel.messages.map(message => {
+                    {this.state.channel.messages.map(message => {
                         return (
                             <li className='message' key={message.id}>
                                 <span className='message__sender'>{message.sender}</span>
-                                <span className='message__text'>{message.message}</span>
+                                <span className='message__text'>{message.content}</span>
                             </li>
                         );
                     })}
                 </ul>
-                <input type='text' placeholder='Say something...' className='chat__input' onChange={this.handleChange} onKeyDown={this.handleSubmit} />
+                <input 
+                    type='text' 
+                    placeholder='Say something...' 
+                    className='chat__input' 
+                    onChange={this.handleChange} 
+                    onKeyDown={this.handleSubmit} 
+                />
             </div>
         );
     }
 }
 
 
-/*
 
- */
 
-/*
-    state: {
-        self: {
-            username: "",
-            password: ""
-        },
-        channels: [
-            {
-                id: n,
-                name: "",
-                participants: [],
-                access: "private" || "party",
-                messages: []
-            }
-        ],
-        isLoggedIn: true || false;
-        view: "home" || "join-chat" || "chat",
-    }
- */
+
+// <input type='text' className='chat__input'
+//     placeholder='Add someone...'
+//     onChange={(event) => this.setState({ toAdd: event.target.value })}
+//     onKeyDown={(event) => {
+//         if (event.key === 'Enter') {
+//             reqEmitter.emit('join-channel', this.state.self.username, this.state.toAdd, this.state.view.info.channel.id);
+
+//             event.target.value = '';
+//         }
+
+//     }}
+// />

@@ -1,5 +1,6 @@
 import React from 'react';
-import { reqEmitter } from '../request';
+// import { reqEmitter } from '../request';
+import { request } from '../client';
 
 export default class Auth extends React.Component {
     render() {
@@ -8,7 +9,7 @@ export default class Auth extends React.Component {
                 <div className='auth-box'>
                     <div className='auth-box__ribbon'></div>
 
-                    <Form />
+                    <Form modifyState={this.props.modifyState}/>
                 </div>
             </div>
         );
@@ -21,7 +22,7 @@ class Form extends React.Component {
         this.state = {
             username: '',
             password: ''
-        }
+        };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -33,7 +34,20 @@ class Form extends React.Component {
     }
 
     handleSubmit(event) {
-        reqEmitter.emit('login', this.state.username);
+        request('login', {
+            username: this.state.username,
+            password: this.state.password
+        }).then((res) => {
+            if (res.status === 'success') {
+                this.props.modifyState({
+                    isLoggedIn: true,
+                    token: res.data.token
+                });
+            } else if (res.status === 'fail') {
+                console.log(res.err);
+            }
+        });
+
         event.preventDefault();
     }
 
@@ -57,11 +71,10 @@ class Form extends React.Component {
                     <input 
                         className='auth-box__field'
                         type='text' 
-                        name='username' 
-                        id='username'
+                        name='password' 
+                        id='password'
                         onChange={this.handleChange}
                         value={this.state.value}
-                        disabled
                     />
                 </div>
 

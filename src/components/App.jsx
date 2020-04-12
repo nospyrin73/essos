@@ -6,16 +6,23 @@ export default class App extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            ...this.props.state
+            isLoggedIn: false,
+            token: ''
         };
+        this.modifyState = this.modifyState.bind(this);
     }
-    
-    componentWillReceiveProps(nextProps) {
-        this.setState(nextProps.state);  
+
+    modifyState(state) {
+        this.setState(state);
     }
 
     render() {
-        const state = this.props.state;
-        return (state.isLoggedIn) ? <Dash state={state}/> : <Auth state={state}/>
+        return (
+            (this.state.isLoggedIn) ?
+                <Dash token={this.state.token} />
+                :
+                <Auth modifyState={this.modifyState} />
+
+        );
     }
 }
