@@ -1,16 +1,33 @@
 :root {
     font-family: Verdana, Arial;
-    --main-color: #EA4848;
-    --secondary-color: #17191C;
-    --whitespace-color: #F8F9FA;
-    --border-color: #DFDFDF;
-    --text-color: #9B9A97; 
+    --accent-color: #EA4848;
+    --background-primary: #FFFFFF;
+    --background-secondary: #F2F5F8;
+
+
+    /* --channels-default:  */
+    --text-normal: #2E2F32;
+    --text-muted: #ACACAC;
+    --text-user: #45474a
+
+    --border-main: #E5E5E5;
+
+
+    --background-message-hover: #F3F8FD;
 }
 
-/* 17191C */
+    /* --secondary-color: #17191C;
+    --whitespace-color: #F8F9FA;
+    --border-color: #DFDFDF;
+    --text-color: #9B9A97;  */
+
 
 #root {
     background-color: var(--whitespace-color);
+}
+
+.dark {
+
 }
 
 .page {

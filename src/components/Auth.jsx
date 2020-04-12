@@ -5,10 +5,8 @@ import { request } from '../client';
 export default class Auth extends React.Component {
     render() {
         return (
-            <div className='auth-container'>
-                <div className='auth-box'>
-                    <div className='auth-box__ribbon'></div>
-
+            <div className='auth'>
+                <div className='auth-container'>
                     <Form modifyState={this.props.modifyState}/>
                 </div>
             </div>
@@ -53,33 +51,35 @@ class Form extends React.Component {
 
     render() {
         return (
-            <form className='auth-box__form' onSubmit={this.handleSubmit}>
-                <div className='auth-box__input'>
-                    <label className='auth-box__label' htmlFor='username'>Username</label>
+            <form className='auth-form' onSubmit={this.handleSubmit}>
+                <div className='auth-input'>
+                    <label className='auth-label' htmlFor='username'>Username</label>
                     <input 
-                        className='auth-box__field'
+                        className='auth-field'
                         type='text' 
                         name='username' 
                         id='username'
+                        placeholder='Username'
                         onChange={this.handleChange}
                         value={this.state.value}
                     />
                 </div>
 
-                <div className='auth-box__input'>
-                    <label className='auth-box__label' htmlFor='password'>Password</label>
+                <div className='auth-input'>
+                    <label className='auth-label' htmlFor='password'>Password</label>
                     <input 
-                        className='auth-box__field'
+                        className='auth-field'
                         type='text' 
                         name='password' 
                         id='password'
+                        placeholder='Password'
                         onChange={this.handleChange}
                         value={this.state.value}
                     />
                 </div>
 
-                <div className='auth-box__input'>
-                    <button className='auth-box__field'>Submit</button>
+                <div className='auth-input'>
+                    <button className='auth-field'>Submit</button>
                 </div>
             </form>
         );
