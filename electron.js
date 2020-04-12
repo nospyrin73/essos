@@ -1,7 +1,7 @@
 const { app, BrowserWindow } = require('electron');
 
 app.whenReady().then(() => {
-    //BrowserWindow.addDevToolsExtension('/home/nospyrin/.config/vivaldi/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.5.0_0');
+    //BrowserWindow.addDevToolsExtension('/home/nospyrin/.config/vivaldi/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.6.0_0');
     let mainWindow = new BrowserWindow({
         minHeight: 720,
         minWidth: 940,

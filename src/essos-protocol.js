@@ -1,9 +1,7 @@
 export class EssosSocket {
-    constructor(socket, handle) {
+    constructor(socket) {
         this._socket = socket;
         // this._socket.on('data', this._onData.bind(this));
-
-        this._handle = handle;
 
         this._buffer = ''; // to persistently store unread buffered data
         this.delimiter = '#';
@@ -105,16 +103,16 @@ export class EssosSocket {
 }
 
 export class Request {
-    constructor(action, body) {
+    constructor(action, data) {
         this.action = action;
-        this.body = body;
+        this.data = data;
     }
 }
 
 export class Response {
-    constructor(action, status, body) {
+    constructor(action, status, data) {
         this.action = action;
         this.status = status;
-        this.body = body;
+        this.data = data;
     }
 }
